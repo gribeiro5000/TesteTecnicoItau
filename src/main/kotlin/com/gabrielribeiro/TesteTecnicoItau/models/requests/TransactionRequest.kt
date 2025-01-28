@@ -5,7 +5,7 @@ import java.math.BigDecimal
 
 data class TransactionRequest(
     @JsonProperty("valor")
-    val value: BigDecimal,
+    val amount: BigDecimal,
     @JsonProperty("dataHora")
     val dateTime: String
 )

@@ -1,9 +1,11 @@
 package com.gabrielribeiro.TesteTecnicoItau.models.entities
 
 import java.math.BigDecimal
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.util.UUID
 
 class TransactionEntity(
-    val value: BigDecimal,
-    val dateTime: LocalDateTime
+    val id: UUID,
+    val amount: BigDecimal,
+    val dateTime: OffsetDateTime
 )
