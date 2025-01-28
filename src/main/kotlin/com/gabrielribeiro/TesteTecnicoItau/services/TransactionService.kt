@@ -63,4 +63,11 @@ class TransactionService {
 
         return isValidTransaction
     }
+
+    fun deleteTransactions(): ResponseEntity<Void> {
+        logger.info("Process starting | Delete transactions")
+        transactionRepository.deleteTransactions()
+        logger.info("All messages was deleted")
+        return ResponseEntity.status(HttpStatus.OK).build()
+    }
 }
