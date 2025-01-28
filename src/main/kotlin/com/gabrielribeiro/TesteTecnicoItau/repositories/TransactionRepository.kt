@@ -8,4 +8,8 @@ class TransactionRepository {
     fun saveTransaction(transactionEntity: TransactionEntity) {
         transactionsEntity.add(transactionEntity)
     }
+
+    fun deleteTransactions() {
+        transactionsEntity.clear()
+    }
 }
