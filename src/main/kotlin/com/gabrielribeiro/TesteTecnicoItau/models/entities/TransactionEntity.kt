@@ -7,5 +7,6 @@ import java.util.UUID
 class TransactionEntity(
     val id: UUID,
     val amount: BigDecimal,
-    val dateTime: OffsetDateTime
+    val transactionDateTime: OffsetDateTime,
+    val eventDateTime: OffsetDateTime
 )
