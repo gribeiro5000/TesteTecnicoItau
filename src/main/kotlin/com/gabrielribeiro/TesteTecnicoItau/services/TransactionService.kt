@@ -1,7 +1,10 @@
 package com.gabrielribeiro.TesteTecnicoItau.services
 
+import com.gabrielribeiro.TesteTecnicoItau.exceptions.BadRequestException
+import com.gabrielribeiro.TesteTecnicoItau.exceptions.UnprocessableEntityException
 import com.gabrielribeiro.TesteTecnicoItau.models.entities.TransactionEntity
 import com.gabrielribeiro.TesteTecnicoItau.models.requests.TransactionRequest
+import com.gabrielribeiro.TesteTecnicoItau.models.responses.ErrorResponse
 import com.gabrielribeiro.TesteTecnicoItau.models.responses.StatisticsResponse
 import com.gabrielribeiro.TesteTecnicoItau.repositories.TransactionRepository
 import org.slf4j.LoggerFactory
@@ -25,7 +28,7 @@ class TransactionService {
             logger.info("transaction with id ${transactionEntity.id} was converted successfully")
 
             if(!transactionValidator(transactionEntity)) {
-                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build()
+                throw UnprocessableEntityException("One of the values are not allowed")
             }
             logger.info("transaction with id ${transactionEntity.id} is valid")
 
@@ -34,21 +37,32 @@ class TransactionService {
 
             return ResponseEntity.status(HttpStatus.CREATED).build()
         } catch (e: Exception) {
-            logger.error("ERROR: " + e.toString())
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build()
+            logger.error(e.message)
+            when (e) {
+                is BadRequestException ->
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build()
+                is UnprocessableEntityException ->
+                    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build()
+                else ->
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+            }
         }
     }
 
     private fun convertTransactionToEntity(
         transactionRequest: TransactionRequest
     ): TransactionEntity {
-        val transaction = TransactionEntity(
-            id = UUID.randomUUID(),
-            amount = transactionRequest.amount,
-            transactionDateTime = OffsetDateTime.parse(transactionRequest.dateTime),
-            eventDateTime = OffsetDateTime.now()
-        )
-        return transaction
+        try {
+            val transaction = TransactionEntity(
+                id = UUID.randomUUID(),
+                amount = transactionRequest.amount,
+                transactionDateTime = OffsetDateTime.parse(transactionRequest.dateTime),
+                eventDateTime = OffsetDateTime.now()
+            )
+            return transaction
+        } catch (ex: Exception) {
+            throw BadRequestException("Invalid Request")
+        }
     }
 
     private fun transactionValidator(
