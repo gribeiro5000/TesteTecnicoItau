@@ -4,7 +4,6 @@ import com.gabrielribeiro.TesteTecnicoItau.exceptions.BadRequestException
 import com.gabrielribeiro.TesteTecnicoItau.exceptions.UnprocessableEntityException
 import com.gabrielribeiro.TesteTecnicoItau.models.entities.TransactionEntity
 import com.gabrielribeiro.TesteTecnicoItau.models.requests.TransactionRequest
-import com.gabrielribeiro.TesteTecnicoItau.models.responses.ErrorResponse
 import com.gabrielribeiro.TesteTecnicoItau.models.responses.StatisticsResponse
 import com.gabrielribeiro.TesteTecnicoItau.repositories.TransactionRepository
 import org.slf4j.LoggerFactory
