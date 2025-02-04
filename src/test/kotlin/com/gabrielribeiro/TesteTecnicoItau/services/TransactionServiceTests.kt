@@ -3,6 +3,7 @@ package com.gabrielribeiro.TesteTecnicoItau.services
 import com.gabrielribeiro.TesteTecnicoItau.exceptions.BadRequestException
 import com.gabrielribeiro.TesteTecnicoItau.models.entities.TransactionEntity
 import com.gabrielribeiro.TesteTecnicoItau.models.requests.TransactionRequest
+import com.gabrielribeiro.TesteTecnicoItau.models.responses.StatisticsResponse
 import com.gabrielribeiro.TesteTecnicoItau.repositories.TransactionRepository
 import io.mockk.*
 import org.junit.Test
@@ -13,11 +14,9 @@ import java.lang.reflect.InvocationTargetException
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.*
-import kotlin.math.exp
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.isAccessible
 import kotlin.test.assertEquals
-import kotlin.test.expect
 
 class TransactionServiceTests {
     private val transactionService = spyk(TransactionService(), recordPrivateCalls = true)
@@ -245,35 +244,73 @@ class TransactionServiceTests {
 
 
 
-    //Testes getStatistics
-    @Test
-    fun `Should return statistics when repository has transactions in last 60 seconds`() {
-
-    }
-
-    @Test
-    fun `Should return statistics with zero when repository don't have events in last 60 seconds`() {
-
-    }
-
-
-
-    //Testes convertTimeToOffSetDateTime
-    @Test
-    fun `Should return last 120 seconds limit datetime`() {
-
-    }
-
-
-
     //Testes calculateStatistics
     @Test
-    fun `Should return statistics with values zero when a empty list send`() {
+    fun `Should return statistics with values zero when an empty list send`() {
+        val mockedEmptyList = emptyList<TransactionEntity>()
+        val expected = StatisticsResponse(
+            count = 0,
+            sum = BigDecimal("0"),
+            avg = BigDecimal("0"),
+            min = BigDecimal("0"),
+            max = BigDecimal("0")
+        )
 
+        val privateFun = TransactionService::class.declaredFunctions.find {
+            it.name == "calculateStatistics"
+        }!!
+        privateFun.isAccessible = true
+
+        val result = privateFun.call(
+            transactionService,
+            mockedEmptyList
+        ) as StatisticsResponse
+
+        assertEquals(expected.count, result.count)
+        assertEquals(expected.sum, result.sum)
+        assertEquals(expected.avg, result.avg)
+        assertEquals(expected.min, result.min)
+        assertEquals(expected.max, result.max)
     }
 
     @Test
     fun `Should return statistics when a list send`() {
+        val mockedTransactions = listOf(
+            TransactionEntity(
+                id = UUID.randomUUID(),
+                amount = BigDecimal("100"),
+                transactionDateTime = OffsetDateTime.now(),
+                eventDateTime = OffsetDateTime.now()
+            ),
+            TransactionEntity(
+                id = UUID.randomUUID(),
+                amount = BigDecimal("150"),
+                transactionDateTime = OffsetDateTime.now(),
+                eventDateTime = OffsetDateTime.now()
+            )
+        )
+        val expected = StatisticsResponse(
+            count = 2,
+            sum = BigDecimal("250"),
+            avg = BigDecimal("125.00"),
+            min = BigDecimal("100"),
+            max = BigDecimal("150")
+        )
 
+        val privateFun = TransactionService::class.declaredFunctions.find {
+            it.name == "calculateStatistics"
+        }!!
+        privateFun.isAccessible = true
+
+        val result = privateFun.call(
+            transactionService,
+            mockedTransactions
+        ) as StatisticsResponse
+
+        assertEquals(expected.count, result.count)
+        assertEquals(expected.sum, result.sum)
+        assertEquals(expected.avg, result.avg)
+        assertEquals(expected.min, result.min)
+        assertEquals(expected.max, result.max)
     }
 }
